@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { PrismaPg } from '@prisma/adapter-pg';
 import { Pool } from 'pg';
+import '@testing-library/jest-dom';
 
 // Create a connection pool
 const connectionString = process.env.DATABASE_URL;

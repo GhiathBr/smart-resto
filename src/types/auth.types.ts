@@ -13,6 +13,8 @@ export interface JWTPayload {
   userId: string;
   email: string;
   role: UserRole;
+  exp?: number; // Token expiration timestamp (seconds since epoch)
+  iat?: number; // Token issued at timestamp (seconds since epoch)
 }
 
 /**
