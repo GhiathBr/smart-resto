@@ -16,7 +16,7 @@ interface Order {
   totalPrice: number;
   status: string;
   createdAt: string;
-  items: OrderItem[];
+  orderItems: OrderItem[];
 }
 
 export default function StaffDashboard() {
@@ -146,7 +146,7 @@ export default function StaffDashboard() {
                 <div className="border-t pt-4">
                   <h4 className="font-medium text-gray-900 mb-2">Items:</h4>
                   <ul className="space-y-2">
-                    {order.items.map((item) => (
+                    {order.orderItems.map((item) => (
                       <li key={item.id} className="flex justify-between text-sm">
                         <span>
                           {item.quantity}x {item.menuItem.name}

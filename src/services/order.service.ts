@@ -16,7 +16,7 @@ export interface OrderWithItems {
   status: string;
   createdAt: Date;
   updatedAt: Date;
-  items: Array<{
+  orderItems: Array<{
     id: string;
     quantity: number;
     price: number;
@@ -74,12 +74,12 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
       id: orderId,
       totalPrice,
       status: 'PENDING',
-      items: {
+      orderItems: {
         create: orderItems,
       },
     },
     include: {
-      items: {
+      orderItems: {
         include: {
           menuItem: true,
         },
@@ -87,14 +87,14 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
     },
   });
 
-  return order;
+  return order as any;
 }
 
 export async function getOrderById(orderId: string): Promise<OrderWithItems | null> {
   const order = await prisma.order.findUnique({
     where: { id: orderId },
     include: {
-      items: {
+      orderItems: {
         include: {
           menuItem: true,
         },
@@ -102,13 +102,13 @@ export async function getOrderById(orderId: string): Promise<OrderWithItems | nu
     },
   });
 
-  return order;
+  return order as any;
 }
 
 export async function getAllOrders(): Promise<OrderWithItems[]> {
   const orders = await prisma.order.findMany({
     include: {
-      items: {
+      orderItems: {
         include: {
           menuItem: true,
         },
@@ -119,5 +119,5 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
     },
   });
 
-  return orders;
+  return orders as any;
 }
