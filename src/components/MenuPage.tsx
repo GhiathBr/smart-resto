@@ -2,6 +2,8 @@
 
 import { useEffect, useState } from 'react';
 import CategorySection from './CategorySection';
+import Cart from './Cart';
+import { useCart } from '@/contexts/CartContext';
 
 interface MenuItem {
   id: string;
@@ -33,6 +35,8 @@ export default function MenuPage() {
   const [categories, setCategories] = useState<Category[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [showCart, setShowCart] = useState(false);
+  const { itemCount } = useCart();
 
   useEffect(() => {
     async function fetchMenuData() {
@@ -121,20 +125,47 @@ export default function MenuPage() {
       {/* Header - Mobile-first sticky navigation */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 md:py-6">
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
-            Our Menu
-          </h1>
-          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">
-            Browse our delicious offerings
-          </p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+                Our Menu
+              </h1>
+              <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">
+                Browse our delicious offerings
+              </p>
+            </div>
+            <button
+              onClick={() => setShowCart(!showCart)}
+              className="relative min-w-[44px] min-h-[44px] p-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 transition-colors"
+              aria-label="View cart"
+            >
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 3h2l.4 2M7 13h10l4-8H5.4M7 13L5.4 5M7 13l-2.293 2.293c-.63.63-.184 1.707.707 1.707H17m0 0a2 2 0 100 4 2 2 0 000-4zm-8 2a2 2 0 11-4 0 2 2 0 014 0z" />
+              </svg>
+              {itemCount > 0 && (
+                <span className="absolute -top-1 -right-1 bg-red-500 text-white text-xs font-bold rounded-full w-5 h-5 flex items-center justify-center">
+                  {itemCount}
+                </span>
+              )}
+            </button>
+          </div>
         </div>
       </header>
 
       {/* Menu Content - Mobile-first padding and spacing */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-7 md:py-8">
-        {Object.entries(groupedItems).map(([categoryId, { categoryName, items }]) => (
-          <CategorySection key={categoryId} categoryName={categoryName} items={items} />
-        ))}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+          <div className="lg:col-span-2">
+            {Object.entries(groupedItems).map(([categoryId, { categoryName, items }]) => (
+              <CategorySection key={categoryId} categoryName={categoryName} items={items} />
+            ))}
+          </div>
+          <div className={`lg:block ${showCart ? 'block' : 'hidden'}`}>
+            <div className="sticky top-24">
+              <Cart />
+            </div>
+          </div>
+        </div>
       </main>
     </div>
   );

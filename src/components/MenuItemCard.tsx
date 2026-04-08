@@ -1,4 +1,7 @@
+'use client';
+
 import Image from 'next/image';
+import { useCart } from '@/contexts/CartContext';
 
 interface MenuItemCardProps {
   id: string;
@@ -9,11 +12,23 @@ interface MenuItemCardProps {
 }
 
 export default function MenuItemCard({
+  id,
   name,
   description,
   price,
   imageUrl,
 }: MenuItemCardProps) {
+  const { addToCart } = useCart();
+
+  const handleAddToCart = () => {
+    addToCart({
+      id,
+      name,
+      price,
+      imageUrl: imageUrl || undefined,
+    });
+  };
+
   return (
     <div className="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow touch-manipulation">
       {/* Image - Optimized for mobile viewing */}
@@ -48,6 +63,7 @@ export default function MenuItemCard({
           </span>
           {/* Touch-friendly button - min 44x44px */}
           <button 
+            onClick={handleAddToCart}
             className="min-w-[44px] min-h-[44px] px-4 py-2 bg-blue-600 text-white text-sm sm:text-base font-medium rounded-lg hover:bg-blue-700 active:bg-blue-800 transition-colors touch-manipulation"
             aria-label={`Add ${name} to cart`}
           >
