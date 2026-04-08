@@ -81,10 +81,10 @@ export default function MenuPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center px-4">
         <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-gray-900 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading menu...</p>
+          <div className="animate-spin rounded-full h-12 w-12 sm:h-16 sm:w-16 border-b-2 border-gray-900 mx-auto mb-4"></div>
+          <p className="text-sm sm:text-base text-gray-600">Loading menu...</p>
         </div>
       </div>
     );
@@ -92,12 +92,12 @@ export default function MenuPage() {
 
   if (error) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
-        <div className="text-center">
-          <p className="text-red-600 mb-4">Error: {error}</p>
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center px-4">
+        <div className="text-center max-w-md">
+          <p className="text-sm sm:text-base text-red-600 mb-4">Error: {error}</p>
           <button
             onClick={() => window.location.reload()}
-            className="px-4 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800"
+            className="min-w-[44px] min-h-[44px] px-6 py-3 bg-gray-900 text-white text-sm sm:text-base font-medium rounded-lg hover:bg-gray-800 active:bg-gray-700 transition-colors touch-manipulation"
           >
             Retry
           </button>
@@ -108,26 +108,30 @@ export default function MenuPage() {
 
   if (menuItems.length === 0) {
     return (
-      <div className="min-h-screen flex items-center justify-center">
+      <div className="min-h-screen min-h-[100dvh] flex items-center justify-center px-4">
         <div className="text-center">
-          <p className="text-gray-600">No menu items available</p>
+          <p className="text-sm sm:text-base text-gray-600">No menu items available</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      {/* Header */}
+    <div className="min-h-screen min-h-[100dvh] bg-gray-50">
+      {/* Header - Mobile-first sticky navigation */}
       <header className="bg-white shadow-sm sticky top-0 z-10">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Our Menu</h1>
-          <p className="mt-2 text-gray-600">Browse our delicious offerings</p>
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 sm:py-5 md:py-6">
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-900 leading-tight">
+            Our Menu
+          </h1>
+          <p className="mt-1 sm:mt-2 text-sm sm:text-base text-gray-600">
+            Browse our delicious offerings
+          </p>
         </div>
       </header>
 
-      {/* Menu Content */}
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      {/* Menu Content - Mobile-first padding and spacing */}
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-7 md:py-8">
         {Object.entries(groupedItems).map(([categoryId, { categoryName, items }]) => (
           <CategorySection key={categoryId} categoryName={categoryName} items={items} />
         ))}
