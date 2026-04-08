@@ -73,7 +73,7 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
     data: {
       id: orderId,
       totalPrice,
-      status: 'pending',
+      status: 'PENDING',
       items: {
         create: orderItems,
       },
