@@ -11,16 +11,13 @@ interface ProtectedRouteProps {
 }
 
 export default function ProtectedRoute({ children, allowedRoles }: ProtectedRouteProps) {
-  const { user, isLoading, checkAuth } = useAuth();
+  const { user, isLoading } = useAuth();
   const router = useRouter();
 
   useEffect(() => {
-    // Check authentication status
-    const isAuthenticated = checkAuth();
-
     if (!isLoading) {
       // If not authenticated, redirect to login
-      if (!isAuthenticated || !user) {
+      if (!user) {
         router.push('/login');
         return;
       }
@@ -34,7 +31,7 @@ export default function ProtectedRoute({ children, allowedRoles }: ProtectedRout
         }
       }
     }
-  }, [user, isLoading, allowedRoles, router, checkAuth]);
+  }, [user, isLoading, allowedRoles, router]);
 
   // Show loading state while checking authentication
   if (isLoading) {
