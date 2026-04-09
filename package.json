@@ -4,9 +4,10 @@
   "description": "A production-ready restaurant ordering platform that replaces WhatsApp/manual orders with a structured online ordering system.",
   "main": "index.js",
   "scripts": {
-    "dev": "next dev",
+    "dev": "node server.js",
+    "dev:next": "next dev",
     "build": "next build",
-    "start": "next start",
+    "start": "NODE_ENV=production node server.js",
     "lint": "next lint",
     "test": "vitest --run",
     "test:watch": "vitest",

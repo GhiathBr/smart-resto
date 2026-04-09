@@ -1,5 +1,6 @@
 import prisma from '@/lib/prisma';
 import { nanoid } from 'nanoid';
+import { emitOrderCreated } from '@/lib/socket';
 
 export interface CartItemInput {
   menuItemId: string;
@@ -86,6 +87,13 @@ export async function createOrder(input: CreateOrderInput): Promise<OrderWithIte
       },
     },
   });
+
+  // Emit real-time event
+  try {
+    emitOrderCreated(order);
+  } catch (error) {
+    console.error('Failed to emit order created event:', error);
+  }
 
   return order as any;
 }

@@ -1,6 +1,7 @@
 'use client';
 
 import { useEffect, useState } from 'react';
+import { useSocket } from '@/hooks/useSocket';
 
 interface OrderItem {
   id: string;
@@ -23,12 +24,49 @@ export default function StaffDashboard() {
   const [orders, setOrders] = useState<Order[]>([]);
   const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState<string>('all');
+  const { socket, isConnected } = useSocket();
 
   useEffect(() => {
     fetchOrders();
-    // Refresh every 5 seconds
-    const interval = setInterval(fetchOrders, 5000);
-    return () => clearInterval(interval);
+  }, []);
+
+  // Listen for real-time order events
+  useEffect(() => {
+    if (!socket) return;
+
+    socket.on('order:created', (newOrder: Order) => {
+      console.log('🔔 New order received:', newOrder.id);
+      setOrders((prev) => [newOrder, ...prev]);
+      
+      // Show browser notification
+      if ('Notification' in window && Notification.permission === 'granted') {
+        new Notification('New Order!', {
+          body: `Order #${newOrder.id.slice(-8)} - $${Number(newOrder.totalPrice).toFixed(2)}`,
+          icon: '/favicon.ico',
+        });
+      }
+    });
+
+    socket.on('order:updated', (updatedOrder: Order) => {
+      console.log('🔄 Order updated:', updatedOrder.id);
+      setOrders((prev) =>
+        prev.map((order) =>
+          order.id === updatedOrder.id ? updatedOrder : order
+        )
+      );
+    });
+
+    return () => {
+      socket.off('order:created');
+      socket.off('order:updated');
+    };
+  }, [socket]);
+
+  // Request notification permission on mount
+  useEffect(() => {
+    if ('Notification' in window && Notification.permission === 'default') {
+      Notification.requestPermission();
+    }
   }, []);
 
   const fetchOrders = async () => {
@@ -64,8 +102,18 @@ export default function StaffDashboard() {
     <div className="min-h-screen bg-gray-50">
       <header className="bg-white shadow-sm">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
-          <h1 className="text-3xl font-bold text-gray-900">Staff Dashboard</h1>
-          <p className="mt-1 text-gray-600">Manage incoming orders</p>
+          <div className="flex justify-between items-center">
+            <div>
+              <h1 className="text-3xl font-bold text-gray-900">Staff Dashboard</h1>
+              <p className="mt-1 text-gray-600">Manage incoming orders</p>
+            </div>
+            <div className="flex items-center gap-2">
+              <div className={`w-3 h-3 rounded-full ${isConnected ? 'bg-green-500' : 'bg-red-500'}`}></div>
+              <span className="text-sm text-gray-600">
+                {isConnected ? 'Live' : 'Disconnected'}
+              </span>
+            </div>
+          </div>
         </div>
       </header>
 
