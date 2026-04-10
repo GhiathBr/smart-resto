@@ -1,6 +1,6 @@
 import prisma from '@/lib/prisma';
 import { nanoid } from 'nanoid';
-import { emitOrderCreated } from '@/lib/socket';
+import { emitOrderCreated, emitOrderUpdated } from '@/lib/socket';
 
 export interface CartItemInput {
   menuItemId: string;
@@ -128,4 +128,56 @@ export async function getAllOrders(): Promise<OrderWithItems[]> {
   });
 
   return orders as any;
+}
+
+
+// Valid status transitions
+const STATUS_TRANSITIONS: Record<string, string[]> = {
+  PENDING: ['PREPARING'],
+  PREPARING: ['DELIVERED'],
+  DELIVERED: [], // Final state
+};
+
+export async function updateOrderStatus(
+  orderId: string,
+  newStatus: 'PENDING' | 'PREPARING' | 'DELIVERED'
+): Promise<OrderWithItems> {
+  // Get current order
+  const currentOrder = await prisma.order.findUnique({
+    where: { id: orderId },
+  });
+
+  if (!currentOrder) {
+    throw new Error('Order not found');
+  }
+
+  // Validate status transition
+  const allowedTransitions = STATUS_TRANSITIONS[currentOrder.status];
+  if (!allowedTransitions.includes(newStatus)) {
+    throw new Error(
+      `Invalid status transition: ${currentOrder.status} → ${newStatus}`
+    );
+  }
+
+  // Update order status
+  const updatedOrder = await prisma.order.update({
+    where: { id: orderId },
+    data: { status: newStatus },
+    include: {
+      orderItems: {
+        include: {
+          menuItem: true,
+        },
+      },
+    },
+  });
+
+  // Emit real-time event
+  try {
+    emitOrderUpdated(updatedOrder);
+  } catch (error) {
+    console.error('Failed to emit order updated event:', error);
+  }
+
+  return updatedOrder as any;
 }

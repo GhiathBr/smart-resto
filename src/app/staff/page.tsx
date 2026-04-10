@@ -83,6 +83,45 @@ export default function StaffDashboard() {
     }
   };
 
+  const updateOrderStatus = async (orderId: string, newStatus: string) => {
+    try {
+      const response = await fetch(`/api/orders/${orderId}/status`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ status: newStatus }),
+      });
+
+      if (!response.ok) {
+        const error = await response.json();
+        alert(error.error || 'Failed to update order status');
+      }
+    } catch (error) {
+      console.error('Failed to update order status:', error);
+      alert('Failed to update order status');
+    }
+  };
+
+  const getNextStatus = (currentStatus: string): string | null => {
+    const transitions: Record<string, string> = {
+      PENDING: 'PREPARING',
+      PREPARING: 'DELIVERED',
+    };
+    return transitions[currentStatus] || null;
+  };
+
+  const getStatusButtonText = (currentStatus: string): string => {
+    const nextStatus = getNextStatus(currentStatus);
+    if (!nextStatus) return '';
+    
+    const labels: Record<string, string> = {
+      PREPARING: 'Start Preparing',
+      DELIVERED: 'Mark as Delivered',
+    };
+    return labels[nextStatus] || nextStatus;
+  };
+
   const filteredOrders = filter === 'all' 
     ? orders 
     : orders.filter(order => order.status === filter);
@@ -209,6 +248,14 @@ export default function StaffDashboard() {
                     <span className="text-lg font-bold">
                       Total: ${Number(order.totalPrice).toFixed(2)}
                     </span>
+                    {getNextStatus(order.status) && (
+                      <button
+                        onClick={() => updateOrderStatus(order.id, getNextStatus(order.status)!)}
+                        className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white rounded-lg font-medium transition-colors"
+                      >
+                        {getStatusButtonText(order.status)}
+                      </button>
+                    )}
                   </div>
                 </div>
               </div>
