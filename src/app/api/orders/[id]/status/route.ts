@@ -3,9 +3,10 @@ import { updateOrderStatus } from '@/services/order.service';
 
 export async function PATCH(
   request: NextRequest,
-  { params }: { params: { id: string } }
+  { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const { id } = await params;
     const body = await request.json();
     const { status } = body;
 
@@ -17,7 +18,7 @@ export async function PATCH(
       );
     }
 
-    const updatedOrder = await updateOrderStatus(params.id, status);
+    const updatedOrder = await updateOrderStatus(id, status);
 
     return NextResponse.json(updatedOrder);
   } catch (error) {
